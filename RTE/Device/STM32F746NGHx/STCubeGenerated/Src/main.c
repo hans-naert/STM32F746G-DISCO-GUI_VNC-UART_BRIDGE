@@ -21,9 +21,10 @@
 #include "main.h"
 #include "string.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,6 +69,7 @@ ETH_HandleTypeDef heth;
 LTDC_HandleTypeDef hltdc;
 
 UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart6;
 
 SDRAM_HandleTypeDef hsdram1;
 
@@ -78,11 +80,13 @@ SDRAM_HandleTypeDef hsdram1;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MPU_Initialize(void);
 static void MPU_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_FMC_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_DMA2D_Init(void);
+static void MX_USART6_UART_Init(void);
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 extern void BSP_SDRAM_Init(void);
@@ -130,9 +134,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
   /* USER CODE END 1 */
 
-  /* MPU Configuration--------------------------------------------------------*/
-  MPU_Config();
-
   /* Enable I-Cache---------------------------------------------------------*/
   SCB_EnableICache();
 
@@ -143,6 +144,9 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+
+  /* MPU Configuration--------------------------------------------------------*/
+  MPU_Config();
 
   /* USER CODE BEGIN Init */
   BSP_SDRAM_Init();                           /* Initialize BSP SDRAM           */
@@ -159,7 +163,17 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_DMA2D_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
+	
+	while(1)
+	{
+		if(__HAL_UART_GET_FLAG(&huart1, USART_ISR_RXNE))
+			huart6.Instance->TDR=huart1.Instance->RDR;
+	
+		if(__HAL_UART_GET_FLAG(&huart6, USART_ISR_RXNE))
+			huart1.Instance->TDR=huart6.Instance->RDR;	
+	}
 
   /* Initialize CMSIS-RTOS2 */
   osKernelInitialize ();
@@ -440,6 +454,42 @@ static void MX_USART1_UART_Init(void)
 
 }
 
+/**
+  * @brief USART6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART6_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART6_Init 0 */
+
+  /* USER CODE END USART6_Init 0 */
+
+  /* USER CODE BEGIN USART6_Init 1 */
+
+  /* USER CODE END USART6_Init 1 */
+  huart6.Instance = USART6;
+  huart6.Init.BaudRate = 115200;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.StopBits = UART_STOPBITS_1;
+  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Mode = UART_MODE_TX_RX;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart6.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart6.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT;
+  huart6.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
+  if (HAL_UART_Init(&huart6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART6_Init 2 */
+
+  /* USER CODE END USART6_Init 2 */
+
+}
+
 /* FMC initialization function */
 static void MX_FMC_Init(void)
 {
@@ -494,6 +544,8 @@ static void MX_FMC_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOG_CLK_ENABLE();
@@ -508,6 +560,8 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
