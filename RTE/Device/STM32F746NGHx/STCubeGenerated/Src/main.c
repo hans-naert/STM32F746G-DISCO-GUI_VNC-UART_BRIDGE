@@ -168,11 +168,63 @@ int main(void)
 	
 	while(1)
 	{
+		uint8_t data;
+		HAL_StatusTypeDef status;
+		int RXNE;
+		
+		RXNE=__HAL_UART_GET_FLAG(&huart1, USART_ISR_RXNE);
+		status = HAL_UART_Receive(&huart1,&data,1,0);
 		if(__HAL_UART_GET_FLAG(&huart1, USART_ISR_RXNE))
-			huart6.Instance->TDR=huart1.Instance->RDR;
-	
+			huart1.Instance->TDR='*';		
+		switch(status)
+		{
+			case HAL_OK: 
+				HAL_UART_Transmit(&huart6,&data,1,0);
+				break;
+			case HAL_TIMEOUT:
+			{
+				if(RXNE)
+				{
+				  char buffer[] = "HAL_TIMEOUT of huart1 while RXNE";
+			    HAL_UART_Transmit(&huart1, (const uint8_t *) buffer, strlen(buffer),HAL_MAX_DELAY);
+				}
+			}
+			break;
+			default:
+			{
+				char buffer[50];
+			  snprintf(buffer,50,"Error while receiving huart1 %d",status);
+			  HAL_UART_Transmit(&huart1, (const uint8_t *) buffer, strlen(buffer),HAL_MAX_DELAY);
+			}
+			break;
+		}
+		
+		RXNE=__HAL_UART_GET_FLAG(&huart6, USART_ISR_RXNE);
+		status = HAL_UART_Receive(&huart6,&data,1,0);
 		if(__HAL_UART_GET_FLAG(&huart6, USART_ISR_RXNE))
-			huart1.Instance->TDR=huart6.Instance->RDR;	
+			huart1.Instance->TDR='!';
+		switch(status)
+		{
+			case HAL_OK: 
+				HAL_UART_Transmit(&huart1,&data,1,0);
+				break;
+			case HAL_TIMEOUT:
+			{
+				if(RXNE)
+				{
+				  char buffer[] = "HAL_TIMEOUT of huart6 while RXNE";
+			    HAL_UART_Transmit(&huart1, (const uint8_t *) buffer, strlen(buffer),HAL_MAX_DELAY);
+				}
+			}
+				break;
+			default:
+			{
+				char buffer[50];
+			  snprintf(buffer,50,"Error while receiving huart6 %d",status);
+			  HAL_UART_Transmit(&huart1, (const uint8_t *) buffer, strlen(buffer),HAL_MAX_DELAY);
+			}
+			break;
+		}
 	}
 
   /* Initialize CMSIS-RTOS2 */
