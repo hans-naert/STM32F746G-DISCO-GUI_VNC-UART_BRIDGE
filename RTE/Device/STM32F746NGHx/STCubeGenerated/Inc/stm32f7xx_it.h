@@ -47,7 +47,8 @@
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-
+void USART1_IRQHandler(void);
+void USART6_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

@@ -21,7 +21,6 @@
 #include "main.h"
 #include "string.h"
 
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
@@ -75,7 +74,8 @@ SDRAM_HandleTypeDef hsdram1;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+uint8_t data_uart6;
+uint8_t data_uart1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -166,16 +166,11 @@ int main(void)
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 	
-	while(1)
-	{
-		if(__HAL_UART_GET_FLAG(&huart1, USART_ISR_RXNE))
-			huart6.Instance->TDR=huart1.Instance->RDR;
-	
-		if(__HAL_UART_GET_FLAG(&huart6, USART_ISR_RXNE))
-			huart1.Instance->TDR=huart6.Instance->RDR;	
-	}
+	HAL_UART_Receive_IT(&huart1,&data_uart1,1);
+	HAL_UART_Receive_IT(&huart6,&data_uart6,1);
 
-  /* Initialize CMSIS-RTOS2 */
+	
+	/* Initialize CMSIS-RTOS2 */
   osKernelInitialize ();
 
   /* Create application main thread */
@@ -565,6 +560,22 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{		
+	if(huart==&huart6)
+	{  	
+		huart1.Instance->TDR=data_uart6;
+		HAL_UART_Receive_IT(&huart6,&data_uart6,1);
+	}
+	
+	if(huart==&huart1)
+	{  	
+		huart6.Instance->TDR=data_uart1;
+		HAL_UART_Receive_IT(&huart1,&data_uart1,1);
+	}	
+}
+
 
 /* USER CODE END 4 */
 
