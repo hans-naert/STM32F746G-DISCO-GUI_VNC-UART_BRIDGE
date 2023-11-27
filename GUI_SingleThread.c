@@ -81,7 +81,14 @@ __NO_RETURN static void GUIThread (void *argument) {
   CreateMyDialog();
 	
 	{
-		char cmd[] = "AT\rATE=1\rAT+VER\r";
+		char cmd[] = "ATE=1\r\
+			AT+NTYP=1\r\
+			AT+DR=3\r\
+			AT+RX2DR=3\r\
+			AT+DC=0\r\
+			AT+APPEUI=0000000000000003\r\
+			AT+AK=6C25AA4CC835CDAE850077F76BBE121D\r\
+			AT+JOIN=1\r";
 		HAL_UART_Transmit(&huart6,(uint8_t*)cmd,strlen(cmd),HAL_MAX_DELAY);
 	}
 		
