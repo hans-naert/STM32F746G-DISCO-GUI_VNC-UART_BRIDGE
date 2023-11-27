@@ -166,7 +166,7 @@ int main(void)
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 	
-	HAL_UART_Receive_IT(&huart1,&data_uart1,1);
+	//HAL_UART_Receive_IT(&huart1,&data_uart1,1);
 	HAL_UART_Receive_IT(&huart6,&data_uart6,1);
 
 	
@@ -569,11 +569,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		HAL_UART_Receive_IT(&huart6,&data_uart6,1);
 	}
 	
-	if(huart==&huart1)
+/*	if(huart==&huart1)
 	{  	
 		huart6.Instance->TDR=data_uart1;
 		HAL_UART_Receive_IT(&huart1,&data_uart1,1);
-	}	
+	}*/	
 }
 
 

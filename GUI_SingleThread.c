@@ -34,6 +34,11 @@
 #include "cmsis_os2.h"
 #include "GUI.h"
 #include "Dialog.h"
+#include "main.h"
+#include <stdio.h>
+#include <string.h>
+
+extern UART_HandleTypeDef huart6;
 
 extern WM_HWIN CreateMyDialog(void);
 extern int  GUI_VNC_X_StartServer(int, int);
@@ -74,7 +79,12 @@ __NO_RETURN static void GUIThread (void *argument) {
 
   GUI_VNC_X_StartServer(0,0);
   CreateMyDialog();
-
+	
+	{
+		char cmd[] = "AT\rATE=1\rAT+VER\r";
+		HAL_UART_Transmit(&huart6,(uint8_t*)cmd,strlen(cmd),HAL_MAX_DELAY);
+	}
+		
   while (1) {
     
     /* All GUI related activities might only be called from here */
