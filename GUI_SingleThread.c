@@ -91,6 +91,14 @@ __NO_RETURN static void GUIThread (void *argument) {
 			AT+JOIN=1\r";
 		HAL_UART_Transmit(&huart6,(uint8_t*)cmd,strlen(cmd),HAL_MAX_DELAY);
 	}
+	
+	HAL_Delay(600/*00*/);
+	
+	{
+		char sendcmd[50];
+		sprintf(sendcmd,"AT+SEND=2,%04X,1\r",0x0123);
+		HAL_UART_Transmit(&huart6,(uint8_t*)sendcmd,strlen(sendcmd),HAL_MAX_DELAY);
+	}
 		
   while (1) {
     
